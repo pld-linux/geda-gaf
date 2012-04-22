@@ -1,0 +1,24 @@
+--- geda-gaf-1.6.2/libgeda/src/s_path.c	2011-01-14 06:02:35.000000000 +0100
++++ geda-gaf-1.6.2/libgeda/src/s_path.c	2012-04-22 21:54:24.748034223 +0200
+@@ -37,9 +37,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include <glib/gmem.h>
+-#include <glib/gmessages.h>
+-#include <glib/gtypes.h>
++#include <glib.h>
+ 
+ #include "libgeda_priv.h"
+ 
+--- geda-gaf-1.6.2/libgeda/src/Makefile.am~	2011-01-14 06:07:48.000000000 +0100
++++ geda-gaf-1.6.2/libgeda/src/Makefile.am	2012-04-22 22:01:52.472208136 +0200
+@@ -67,7 +67,7 @@
+ 	$(GDK_PIXBUF_CFLAGS)
+ libgeda_la_LDFLAGS = -version-info $(LIBGEDA_SHLIB_VERSION) \
+ 	$(WINDOWS_LIBTOOL_FLAGS) $(MINGW_LDFLAGS) $(GUILE_LIBS) \
+-	$(GLIB_LIBS) $(GDK_PIXBUF_LIBS)
++	$(GLIB_LIBS) $(GDK_PIXBUF_LIBS) -lm
+ LIBTOOL=@LIBTOOL@ --silent
+ 
+ MOSTLYCLEANFILES = *.log core FILE *~

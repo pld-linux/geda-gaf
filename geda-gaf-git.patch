@@ -1,0 +1,58 @@
+From: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date: Wed, 19 Jan 2011 22:12:49 +0000 (+0100)
+Subject: gschem: fix refresh in component seleciton dialog
+X-Git-Url: http://git.gpleda.org/?p=gaf.git;a=commitdiff_plain;h=334307f0c4f68f704eec422af077b9e32d37b177;hp=a30f00bbee18ad5140616ad6459365cb48b03ee7
+
+gschem: fix refresh in component seleciton dialog
+
+Block signal handler for GtkTreeSelection "updated" signal while the
+refreshed GtkTreeModel is installed in the GtkTreeView widget.
+
+This is necessary as x_compselect_callback_response cannot reliably
+determine whether it has been triggered by update of "library" or "in
+use" tree views.
+
+Closes-bug: lp-704829
+
+(cherry picked from commit 2e5decb6ff1601935cc1f005a312ca04b6d13dfb)
+---
+
+diff --git a/gschem/src/x_compselect.c b/gschem/src/x_compselect.c
+index 13e93f4..0917b79 100644
+--- a/gschem/src/x_compselect.c
++++ b/gschem/src/x_compselect.c
+@@ -810,6 +810,7 @@ compselect_callback_refresh_library (GtkButton *button, gpointer user_data)
+ {
+   Compselect *compselect = COMPSELECT (user_data);
+   GtkTreeModel *model;
++  GtkTreeSelection *selection;
+ 
+   /* Rescan the libraries for symbols */
+   s_clib_refresh ();
+@@ -826,11 +827,26 @@ compselect_callback_refresh_library (GtkButton *button, gpointer user_data)
+                                           compselect,
+                                           NULL);
+ 
++  /* Block handling selection updated for duration of model changes */
++  selection = gtk_tree_view_get_selection (compselect->libtreeview);
++  g_signal_handlers_block_by_func (selection,
++                                   compselect_callback_tree_selection_changed,
++                                   compselect);
++
++  /* Update the view model with signals blocked */
+   gtk_tree_view_set_model (compselect->libtreeview, model);
+ 
+   /* Refresh the "In Use" view */
+   model = create_inuse_tree_model (compselect);
++
++  /* Here we can update the model without blocking signals
++   * as this is the second (final) tree view we are updating */
+   gtk_tree_view_set_model (compselect->inusetreeview, model);
++
++  /* Unblock & fire handler for libtreeview selection */
++  g_signal_handlers_unblock_by_func (selection,
++                                     compselect_callback_tree_selection_changed,
++                                     compselect);
+ }
+ 
+ /*! \brief Creates the treeview for the "In Use" view. */
