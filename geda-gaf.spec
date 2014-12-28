@@ -18,7 +18,7 @@ BuildRequires:	desktop-file-utils
 BuildRequires:	gawk
 BuildRequires:	intltool
 BuildRequires:	gd-devel
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-tools
 BuildRequires:	libtool
 BuildRequires:	libltdl-devel
 BuildRequires:	shared-mime-info
